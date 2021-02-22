@@ -1,0 +1,1 @@
+ python3 data_preprocess.py --input_file=data/sample.conll --output_dir=data/
