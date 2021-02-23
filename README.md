@@ -20,4 +20,6 @@ For the project development, following technologies are used:
 
 
 ### Data Preprocessing
-For preprocessing, simply run the command `python3 data_preprocess.py --input_file=data/sample.conll --output_dir=data/` or `data_preprocess.sh` file. 
+- Step 0) Enter into the directory of the project from the terminal: `cd pos_tagger`.   
+- Step 1) Generate `sample.conll` file from the given `.conll` files using the command `cat ./data/given_files/*.gold_conll > data/sample.conll` from the terminal.  
+- Step 2) For preprocessing, simply run the command `python3 data_preprocess.py --input_file=data/sample.conll --output_dir=data/` or `data_preprocess.sh` file. 
