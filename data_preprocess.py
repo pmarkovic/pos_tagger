@@ -28,7 +28,7 @@ def create_tsv_and_fetch_info(input_file, out_dir):
 
             for i in range(len(sents)):
 
-                if sents[i].startswith('#'):
+                if sents[i].startswith('#'):  # ignore lines starting with #
                     continue
 
                 if sents[i] == '\n':  # marks the end of sequence
