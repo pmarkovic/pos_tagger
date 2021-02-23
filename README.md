@@ -14,7 +14,10 @@ In this project, a neural model is trained on sample.conll data to perform the t
 
 ## Technologies
 For the project development, following technologies are used:
-- Python: 3.9
+- Python: 3.8
 
 ## Setup
+
+
 ### Data Preprocessing
+For preprocessing, simply run the command `python3 data_preprocess.py --input_file=data/sample.conll --output_dir=data/` or `data_preprocess.sh` file. 
