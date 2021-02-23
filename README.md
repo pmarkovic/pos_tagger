@@ -18,6 +18,9 @@ For the project development, following technologies are used:
 
 ## Setup
 
+### Create environment
+- Step 0) Clone the repo: `git clone https://github.com/pmarkovic/pos_tagger.git`
+- Step 1) Create conda environment: `conda env create -f pavle_rricha.yml`
 
 ### Data Preprocessing
 - Step 0) Enter into the directory of the project from the terminal: `cd pos_tagger`.   
