@@ -46,7 +46,7 @@ def create_tsv_and_fetch_info(args):
                         of.write('*\n')
                         continue
                     
-                    # 2th token is word index
+                    # 2nd token is word index
                     # 3rd token is word
                     # 4th token is POS tag
                     tokens = sent.split()
