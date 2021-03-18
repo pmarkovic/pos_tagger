@@ -7,13 +7,13 @@ class ProtoNet(nn.Module):
     Implementation of Prototypical network model.
     """
   
-    def __init__(self, bert_model, mdim=512):
+    def __init__(self, bert_model, mdim, bdim):
         super(ProtoNet, self).__init__()
 
         self.embed = BertModel.from_pretrained(bert_model)
 
-        self.tags_linear = nn.Linear(768, mdim)
-        self.words_linear = nn.Linear(768, mdim)
+        self.tags_linear = nn.Linear(bdim, mdim)
+        self.words_linear = nn.Linear(bdim, mdim)
 
         for param in self.embed.parameters():
             param.requires_grad=False
