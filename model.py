@@ -9,7 +9,9 @@ class ProtoNet(nn.Module):
   
     def __init__(self, bert_model, mdim, bdim):
         super(ProtoNet, self).__init__()
-
+        
+        # model must be downloaded locally in order for this to work
+        # in Google Colab works fine
         self.embed = BertModel.from_pretrained(bert_model)
 
         self.tags_linear = nn.Linear(bdim, mdim)

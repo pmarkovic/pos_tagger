@@ -9,7 +9,10 @@ class DataLoader:
     """
 
     def __init__(self, bert_model, k, n):
+        # model must be downloaded locally in order for this to work
+        # in Google Colab works fine
         self.tokenizer = BertTokenizer(bert_model)
+
         self.k = k
         self.n = n
 
