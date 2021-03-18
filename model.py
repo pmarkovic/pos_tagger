@@ -7,10 +7,10 @@ class ProtoNet(nn.Module):
     Implementation of Prototypical network model.
     """
   
-    def __init__(self, model, mdim=512):
+    def __init__(self, bert_model, mdim=512):
         super(ProtoNet, self).__init__()
 
-        self.embed = BertModel.from_pretrained(model)
+        self.embed = BertModel.from_pretrained(bert_model)
 
         self.tags_linear = nn.Linear(768, mdim)
         self.words_linear = nn.Linear(768, mdim)
@@ -28,6 +28,7 @@ class ProtoNet(nn.Module):
         words_metric = self.words_linear(words_embed)
 
         # To get embeddings instead of predictions
+        # Should be useful for visualization
         if not prediction:
             return tags_metric, words_metric
 
