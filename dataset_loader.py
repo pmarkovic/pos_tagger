@@ -1,7 +1,9 @@
 import argparse
 import logging
+from pprint import pprint
+
 import torch
-from transformers import BertTokenizer
+from transformers import BertTokenizer, AutoTokenizer, AutoModel
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
@@ -15,6 +17,10 @@ _DESCRIPTION = """\
 """
 
 class PosData(datasets.GeneratorBasedBuilder):
+    """
+    converts .tsv files into hugging-face dataset. English dataset is split into train and validation. (80-20 split)
+    srb-de-combined-file is loaded as the test dataset
+    """
 
     def _info(self):
         return datasets.DatasetInfo(description=_DESCRIPTION,
@@ -80,33 +86,24 @@ def arg_parser():
 if __name__ == '__main__':
     args = arg_parser()
     dataset = datasets.load_dataset('dataset_loader.py', data_files={'train':args.train, 'test': args.test})
-    tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
-    model = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
-    print(dataset['train'])
-    # for sent in dataset['train']:
-    #     print(sent['sentence'])
-    encoded_dataset = dataset['train'].map(lambda sent: tokenizer(sent['word_list'], is_split_into_words=True, padding=True, return_tensors='pt'))
-    print(encoded_dataset.column_names)
-    print(encoded_dataset[0])
-    #embeddings = model(**encoded_dataset)
-    for ids in encoded_dataset['input_ids']:
-        print(ids)
-        print(tokenizer.decode(ids[0]))
+    tokenizer = AutoTokenizer.from_pretrained('bert-base-multilingual-cased') # With AutoTokenizer, huggingface uses faster rust implementation of the tokenizer
+    model = AutoModel.from_pretrained('bert-base-multilingual-cased')
 
-    #TODO: convert to Torch dataset, https://colab.research.google.com/github/huggingface/datasets/blob/master/notebooks/Overview.ipynb#scrollTo=QvExTIZWvSVw
-    # Format dataset to outputs torch.Tensor to pass through BertModel and train a pytorch model
-    #columns = ['input_ids', 'token_type_ids', 'attention_mask',]
-    #encoded_dataset.set_format(type='torch', columns=columns)
+    batch_wordlists = []
+    for sent in dataset['train']:
+        batch_wordlists.append(sent['word_list'])
 
+    # offset_map returns start and end positions of bert tokens (0,0) for special tokens
+    # https://stackoverflow.com/questions/66666525/how-to-map-token-indices-from-the-squad-data-to-tokens-from-bert-tokenizer
+    encoded_input_with_offset_mapping = tokenizer(batch_wordlists, is_split_into_words=True, padding=True, return_tensors='pt', return_offsets_mapping=True)
 
-    # Instantiate a PyTorch Dataloader around our dataset
-    # dynamic batching (pad on the fly with our own collate_fn)
-    #def collate_fn(examples):
-    #    return tokenizer.pad(examples, return_tensors='pt')
+    encoded_input = encoded_input_with_offset_mapping
+    encoded_input.pop('offset_mapping')
+    logging.info(encoded_input.keys(), encoded_input_with_offset_mapping.keys())
+
+    embeddings = model(**encoded_input)[0].squeeze() # MemoryError on CPU - TODO: test on collab
 
 
-    #dataloader = torch.utils.data.DataLoader(encoded_dataset['train'], collate_fn=collate_fn, batch_size=8)
-    #print(dataset.map(lambda example: print(len(example.train.features["word_list"]))))
 
 
 
