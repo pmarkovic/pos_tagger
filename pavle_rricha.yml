@@ -21,4 +21,4 @@ dependencies:
   - wheel=0.36.2=pyhd3eb1b0_0
   - xz=5.2.5=h7b6447c_0
   - zlib=1.2.11=h7b6447c_3
-prefix: /home/rrichajalota/data/miniconda3/envs/pavle_rricha
+#prefix: /home/rrichajalota/data/miniconda3/envs/pavle_rricha

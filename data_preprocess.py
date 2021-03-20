@@ -8,11 +8,10 @@ def arg_parser():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--data_dir", default='data/ontonetes-4.0',
+    parser.add_argument("--data_dir", default='test_data/ontonetes-4.0',
                         help='use this option to provide a path to data dir (default=data/ontonetes-4.0).')
-    parser.add_argument("--out_dir", default='data/',
+    parser.add_argument("--out_dir", default='test_data/',
                         help="use this option to provide the output dir (default=data/)")
-
     args = parser.parse_args()
     return args
 
@@ -25,7 +24,7 @@ def create_tsv_and_fetch_info(args):
     sequence_len_list = []  #contains length of every sequence
     num_words_per_tag = Counter()
     data_path = os.path.join(os.getcwd(), args.data_dir)
-    output_file = os.path.join(os.getcwd(), args.out_dir, 'ontonetes-4.0.tsv')
+    output_file = os.path.join(os.getcwd(), args.out_dir, 'ontonotes-4.0.tsv')
 
     with open(output_file, 'w+') as of:
 
@@ -59,7 +58,8 @@ def create_tsv_and_fetch_info(args):
 
 def write_info_to_file(args, num_words_per_tag, sequence_len_list):
     total_words = sum(num_words_per_tag.values())
-    output_file = os.path.join(os.getcwd(), args.out_dir, 'ontonetes-4.0.info')
+    output_file = os.path.join(os.getcwd(), args.out_dir, 'ontonotes-4.0.info')
+
 
     with open(output_file, 'w+') as f:
         f.write(f'Maximum sequence length: {sequence_len_list[-1]}\n')
