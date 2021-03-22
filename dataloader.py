@@ -143,9 +143,11 @@ def get_episode_data(k, n):
             episode_labels.append(ind)
 
     episode_tags_embs = [ ptag2embed_dict[tag] for tag in episode_tags ]  # embeddings for the randomly chosen tags/labels
-    episode_tags_embs = torch.stack(episode_tags_embs).to('cpu') # device = 'cpu'/'gpu'
+    episode_tags_embs = torch.cat(episode_tags_embs).to('cpu') # device = 'cpu'/'gpu'
     episode_labels = torch.tensor(episode_labels)
     episode_word_embs = torch.stack(episode_word_embs).to('cpu')
+
+    #print(f'episode_tags_embs {episode_tags_embs.shape} episode_word_embs {episode_word_embs.shape}')
 
     return  episode_tags_embs, episode_word_embs, episode_labels
 

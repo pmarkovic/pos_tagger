@@ -50,7 +50,6 @@ class ProtoNet(nn.Module):
         n_tags = tags.shape[0]
 
         print(words.shape, tags.shape)
-        # TODO: fix RuntimeError: expand(torch.FloatTensor{[1, 10, 1, 512]}, size=[50, 10, -1]): the number of sizes provided (3) must be greater or equal to the number of dimensions in the tensor (4)
         
         # Calculate squared Euclidean distance
         distances = (
