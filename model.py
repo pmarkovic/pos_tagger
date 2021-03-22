@@ -1,5 +1,4 @@
 import torch.nn as nn
-from transformers import BertModel
 
 
 class ProtoNet(nn.Module):
@@ -7,24 +6,13 @@ class ProtoNet(nn.Module):
     Implementation of Prototypical network model.
     """
   
-    def __init__(self, bert_model, mdim, bdim):
+    def __init__(self, mdim, bdim):
         super(ProtoNet, self).__init__()
-        
-        # model must be downloaded locally in order for this to work
-        # in Google Colab works fine
-        self.embed = BertModel.from_pretrained(bert_model)
 
         self.tags_linear = nn.Linear(bdim, mdim)
         self.words_linear = nn.Linear(bdim, mdim)
 
-        for param in self.embed.parameters():
-            param.requires_grad=False
-
     def forward(self, tags_embed, words_embed, prediction=True):
-        # Obtain BERT embeddings
-        #tags_embed = self.embed(**tags_ind)[1]
-        #words_embed = self.embed(**words_ind)[1]
-
         # Transform to metric system
         tags_metric = self.tags_linear(tags_embed)
         words_metric = self.words_linear(words_embed)

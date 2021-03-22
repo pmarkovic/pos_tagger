@@ -52,8 +52,7 @@ def train(args):
     # Initialization
     print("Initialization...")
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    #dataloader = DataLoader(args.bert_model, args.k, args.n)
-    model = ProtoNet(args.bert_model, args.mdim, args.bdim)
+    model = ProtoNet(args.mdim, args.bdim)
     model.to(device)
 
     optimizer = optim.Adam(model.parameters(), lr=float(args.lr))
@@ -63,29 +62,26 @@ def train(args):
     print(f"Hyperparameters:\n\tK: {args.k}\n\tN: {args.n}\n\tEp: {args.ep}\n\tlr: {args.lr}")
     print(f"{''.join(['-']*20)}\n")
 
-    cycle_loss = 0
-
     for episode in range(args.ep):
-        #print(f"Starting episode: {episode+1}...")
         optimizer.zero_grad()
 
         # Select the episode examples
         tags_embd, words_embd, true_labels = get_episode_data(args.ptag_emb, args.train, args.k, args.n, device)
 
         # Episode pass
-        log_loss, predictions = model(tags_embd, words_embd)
+        log_loss, _ = model(tags_embd, words_embd)
 
         # Calc loss
         loss = loss_fn(log_loss, true_labels)
-        cycle_loss += loss.item()
+        print(f"Episode {episode+1} loss: {loss.item()}")
         
-        # TODO
-        # This should be change, so that we evaluate model after N episodes
-        # both on train and validation sets.
-        # But we should also keep track of loss per episode
+        # Calcualte train and validation losses after 10 episodes
         if (episode+1) % 10 == 0:
-            print(f"After {episode+1} episodes, loss: {cycle_loss / 10}")
-            cycle_loss = 0
+            _, train_loss = eval(model, args.ptag_emb, args.train, device, split="train")
+            _, valid_loss = eval(model, args.ptag_emb, args.train, device)
+
+            print(f"Train loss {train_loss}, after {episode+1} episodes.")
+            print(f"Validation loss {valid_loss}, after {episode+1} episodes.")
 
         # Backprop step
         loss.backward()
