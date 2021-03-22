@@ -1,10 +1,11 @@
 import argparse
+from pathlib import Path
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
-from pathlib import Path
+import wandb
 
 from util import get_episode_data, eval
 from model import ProtoNet
@@ -44,6 +45,8 @@ def arg_parser():
 
 
 def train(args):
+    wandb.init(project="multi-pos")
+
     # check if the directory to save model exists, if not create
     Path(args.model_path).mkdir(parents=True, exist_ok=True)
 
@@ -62,10 +65,19 @@ def train(args):
     optimizer = optim.Adam(model.parameters(), lr=float(args.lr))
     loss_fn = nn.NLLLoss()
 
-    print(f"Device: {device}")
-    print(f"Hyperparameters:\n\tK: {args.k}\n\tN: {args.n}\n\tEp: {args.ep}\n\tlr: {args.lr}")
-    print(f"{''.join(['-']*20)}\n")
+    config = wandb.config
+    config.k = args.k
+    config.n = args.n
+    config.ep = args.ep
+    config.lr = args.lr
+    config.mdim = args.mdim
+    config.seed = args.seed
 
+    #print(f"Device: {device}")
+    #print(f"Hyperparameters:\n\tK: {args.k}\n\tN: {args.n}\n\tEp: {args.ep}\n\tlr: {args.lr}")
+    #print(f"{''.join(['-']*20)}\n")
+
+    wandb.watch(model)
     for episode in range(args.ep):
         optimizer.zero_grad()
 
@@ -77,12 +89,16 @@ def train(args):
 
         # Calc loss
         loss = loss_fn(log_loss, true_labels)
+        wandb.log({"ep_loss": loss.item()})
         print(f"Episode {episode+1} loss: {loss.item()}")
         
         # Calcualte train and validation losses after 10 episodes
         if (episode+1) % 10 == 0:
             acc, train_loss = eval(model, args.ptag_emb, args.train, device, split="train")
             val_acc, valid_loss = eval(model, args.ptag_emb, args.train, device)
+
+            wandb.log({"train_loss": train_loss, "valid_loss": valid_loss, "acc": acc, "val_acc": val_acc})
+            #print(f"Processed {episode+1} episodes...")
 
             print(f"Train loss {train_loss}, after {episode+1} episodes.")
             print(f"Validation loss {valid_loss}, after {episode+1} episodes.")
