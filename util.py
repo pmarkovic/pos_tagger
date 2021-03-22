@@ -36,7 +36,6 @@ def eval(model, ptag_emb_filepath, train_eg_dir, device, split='validation'):
 
         for ind, tag in enumerate(tags):
             for word in tag2wd_emb[tag]:
-                word.requires_grad = False
                 words_embd.append(word)
                 labels.append(ind)
 
@@ -87,7 +86,6 @@ def get_episode_data(ptag_emb_filepath, train_eg_dir, k, n, device='cpu'):
     episode_labels = [] # label pertaining to each word in episode_word_embs
     for ind, tag in enumerate(episode_tags):
         for word in np.random.choice(tag2wd_emb[tag], size=n, replace=False):
-            word.requires_grad = False
             episode_word_embs.append(word)
             episode_labels.append(ind)
 
