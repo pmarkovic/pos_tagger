@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+from pathlib import Path
 
 from util import get_episode_data, eval
 from model import ProtoNet
@@ -13,8 +14,8 @@ def arg_parser():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--model_path", default='models/model.pt',
-                        help="path where to save the trained model (default=models/model.pt).")
+    parser.add_argument("--model_path", default='models/',
+                        help="path where to save the trained model (default=models/).")
     parser.add_argument("--bert_model", default="bert-base-multilingual-cased",
                         help="bert model to use for encoding text (default=bert-base-multilingual-cased).")
     parser.add_argument("--mdim", default=512, type=int,
@@ -43,6 +44,9 @@ def arg_parser():
 
 
 def train(args):
+    # check if the directory to save model exists, if not create
+    Path(args.model_path).mkdir(parents=True, exist_ok=True)
+
     # For the reproducibility purpose
     torch.manual_seed(args.seed)
     torch.backends.cudnn.deterministic = True
@@ -89,7 +93,7 @@ def train(args):
 
     print("End of training...")
 
-    torch.save(model, args.model_path)
+    torch.save(model, args.model_path+"model.pt")
 
 
 if __name__ == "__main__":
