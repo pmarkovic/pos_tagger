@@ -14,69 +14,6 @@ logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 FILTERED_POS_TAGS = {"NNP", ",", "DT", "NN", "CC", "CD", "NNS", "PRP", "VBD", "VBN", 
                      "IN", "VBG", ".", "RB", "JJ", "TO", "VB", "VBP", "MD", "VBZ"}
 
-_DESCRIPTION = """\
- Every example in the dataset contains:
- 1) a sentence ID
- 2) word_list of the words in the sentence
- 3) tag_list containing POS tag corresponding to each word 
-"""
-
-
-class PosData(datasets.GeneratorBasedBuilder):
-    """
-    converts .tsv files into hugging-face dataset. English dataset is split into train and validation. (80-20 split)
-    srb-de-combined-file is loaded as the test dataset
-    """
-
-    def _info(self):
-        return datasets.DatasetInfo(description=_DESCRIPTION,
-                                    features=datasets.Features({
-                                        "sent_id": datasets.Value("int32"),
-                                        "word_list": datasets.features.Sequence(datasets.Value("string")),
-                                        "tag_list": datasets.features.Sequence(datasets.Value("string")),
-                                    })
-                                    )
-
-    def _split_generators(self, dl_manager):
-        train_file, test_file = self.config.data_files['train'], self.config.data_files['test']
-
-        # combine words into sequence_lists s.t. dataset = [(wordlist1, taglist1), (wordList2, tagList2)..]
-        train_dataset = self.generate_sequenceBased_dataset(train_file)
-        test_dataset = self.generate_sequenceBased_dataset(test_file)
-
-        return [
-            datasets.SplitGenerator(name=datasets.Split.TRAIN, gen_kwargs={"data": train_dataset[:int(0.8*len(train_dataset))]}),
-            datasets.SplitGenerator(name=datasets.Split.VALIDATION, gen_kwargs={"data": train_dataset[int(0.8*len(train_dataset)):]}),
-            datasets.SplitGenerator(name=datasets.Split.TEST, gen_kwargs={"data": test_dataset})
-        ]
-
-    def generate_sequenceBased_dataset(self, filename):
-        dataset = []
-        with open(filename) as f:
-            sent = []
-            pos_tags = []
-            for line in f:
-                if line.startswith('*'):
-                    # marks the end of line
-                    #logging.info(f"{sent}\n{pos_tags}")
-                    dataset.append((sent, pos_tags))
-                    sent, pos_tags = [], []
-                else:
-                    tokens = line.split()
-                    sent.append(tokens[1])
-                    pos_tags.append(tokens[2])
-        return dataset
-
-    def _generate_examples(self, data):
-        logging.info("generating examples..")
-        for id, tup in enumerate(data):
-            #logging.info(f"{tup[0]}\n{tup[1]}")
-            yield id, {
-                "sent_id": id,
-                "word_list": tup[0],
-                "tag_list": tup[1],
-            }
-
 
 def arg_parser():
     parser = argparse.ArgumentParser()
@@ -92,15 +29,18 @@ def arg_parser():
                         help="bert model to use for encoding text (default=bert-base-multilingual-cased).")
     parser.add_argument("--gen_embed", default=False, action="store_true",
                         help="flag to indicate if embeddings should be generated (default=False).")
+    parser.add_argument("--batch_size", default=50, type=int,
+                        help="batches of sentences will be created with the given size for generating embeddings (default=50)")
     args = parser.parse_args()
     return args
 
 
-def create_input_batches(dataset, batch_size):
+def create_input_batches(dataset, batch_size, split='train'):
+    """split: accepts the following arguments - 'train', 'test', 'validation'"""
     batched_wordLists = []
     input_batches = []
     pos_tags = []
-    for sent in dataset['train']:
+    for sent in dataset[split]:
         batched_wordLists.append(sent['word_list'])
         pos_tags.append(sent['tag_list'])
         if len(batched_wordLists) % batch_size == 0:
@@ -111,14 +51,36 @@ def create_input_batches(dataset, batch_size):
     return input_batches
 
 
+def save_ptag_embeddings(args, tokenizer, model):
+    """save to temp_dir"""
+    ptag2embedding = dict()
+    for ptag in FILTERED_POS_TAGS:
+        encoded_tag = tokenizer(ptag, return_tensors="pt", padding=True)
+        embedding = model(**encoded_tag)[0].squeeze()
+        ptag2embedding[ptag] = torch.mean(embedding, dim=0, keepdim=True)
+
+    print(ptag2embedding)
+
+    with open(f'{args.temp_dir}/ptag2embedding.pkl', 'wb') as f:
+        pkl.dump(ptag2embedding, f)
+
+
 def generate_embeddings(args):
-    dataset = datasets.load_dataset('gen_embeddings.py', data_files={'train':args.train, 'test': args.test})
-    tokenizer = AutoTokenizer.from_pretrained(args.bert_model) # With AutoTokenizer, huggingface uses faster rust implementation of the tokenizer
+    Path(args.temp_dir).mkdir(parents=True, exist_ok=True)
+    Path(args.examples_dir).mkdir(parents=True, exist_ok=True)
+
+    # With AutoTokenizer, huggingface uses faster rust implementation of the tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(args.bert_model)
     model = AutoModel.from_pretrained(args.bert_model)
 
-    input_batches = create_input_batches(dataset, batch_size=50)
+    # create embeddings for tags
+    save_ptag_embeddings(args, tokenizer, model)
+
+
+    dataset = datasets.load_dataset('dataloader.py', data_files={'train': args.train, 'test': args.test})
+    # create input batches for training
+    input_batches = create_input_batches(dataset, batch_size=args.batch_size, split='train')
     print(len(input_batches))
-    Path(args.temp_dir).mkdir(parents=True, exist_ok=True)
 
     n_batch = 0
 
@@ -129,7 +91,6 @@ def generate_embeddings(args):
         encoded_input_with_offset_mapping = tokenizer(batched_wordLists, is_split_into_words=True, padding=True, return_tensors='pt', return_offsets_mapping=True)
         encoded_input = deepcopy(encoded_input_with_offset_mapping)
         encoded_input.pop('offset_mapping')
-        # logging.info(f"encoded_input.keys() : {encoded_input.keys()}, encoded_input_with_offset_mapping.keys() {encoded_input_with_offset_mapping.keys()}")
 
         batched_word2token_position = [] # for every wordlist in the batch, stores [(word1, pos_tag1, token_start_pos, token_end_pos),..]
         tokens_embed = defaultdict(list)
@@ -137,7 +98,7 @@ def generate_embeddings(args):
         for i, wordlist in enumerate(batched_wordLists):
             #print(wordlist)
             word2token_position = []
-            k = 1
+            k = 1 # skip 0th position that contains special token [CLS]
             for j, word in enumerate(wordlist):
                 tup = encoded_input_with_offset_mapping['offset_mapping'][i][k]
                 start_pos = k
@@ -171,10 +132,10 @@ def generate_embeddings(args):
 
         with open(f"{args.temp_dir}/batch_{n_batch}_embeds.pkl", "wb") as f:
             pkl.dump(tokens_embed, f)
-        
+
         n_batch += 1
         if n_batch % 100 == 0:
-            print(f"{n_batch} batches processed...")
+            logging.info(f"{n_batch} batches processed...")
 
 
 def merge_files(args):
@@ -209,4 +170,4 @@ if __name__ == '__main__':
     if args.gen_embed:
         generate_embeddings(args)
 
-    merge_files(args)
+    #merge_files(args)

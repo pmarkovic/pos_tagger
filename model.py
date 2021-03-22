@@ -20,10 +20,10 @@ class ProtoNet(nn.Module):
         for param in self.embed.parameters():
             param.requires_grad=False
 
-    def forward(self, tags_ind, words_ind, prediction=True):
+    def forward(self, tags_embed, words_embed, prediction=True):
         # Obtain BERT embeddings
-        tags_embed = self.embed(**tags_ind)[1]
-        words_embed = self.embed(**words_ind)[1]
+        #tags_embed = self.embed(**tags_ind)[1]
+        #words_embed = self.embed(**words_ind)[1]
 
         # Transform to metric system
         tags_metric = self.tags_linear(tags_embed)
@@ -48,6 +48,9 @@ class ProtoNet(nn.Module):
     def _calc_distances(self, words, tags):
         n_words = words.shape[0]
         n_tags = tags.shape[0]
+
+        print(words.shape, tags.shape)
+        # TODO: fix RuntimeError: expand(torch.FloatTensor{[1, 10, 1, 512]}, size=[50, 10, -1]): the number of sizes provided (3) must be greater or equal to the number of dimensions in the tensor (4)
         
         # Calculate squared Euclidean distance
         distances = (

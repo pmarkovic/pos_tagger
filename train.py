@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 
-from dataloader import DataLoader
+from dataloader import get_episode_data
 from model import ProtoNet
 
 def arg_parser():
@@ -15,8 +15,8 @@ def arg_parser():
 
     parser.add_argument("--model_path", default='models/model.pt',
                         help="path where to save the trained model (default=models/model.pt).")
-    parser.add_argument("--bert_model", default="bert-base-cased",
-                        help="bert model to use for encoding text (default=bert-base-cased).")
+    parser.add_argument("--bert_model", default="bert-base-multilingual-cased",
+                        help="bert model to use for encoding text (default=bert-base-multilingual-cased).")
     parser.add_argument("--mdim", default=512,
                         help="dimension of embeddings in a metric space (default=512).")
     parser.add_argument("--bdim", default=768,
@@ -46,7 +46,7 @@ def train(args):
     # Initialization
     print("Initialization...")
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    dataloader = DataLoader(args.bert_model, args.k, args.n)
+    #dataloader = DataLoader(args.bert_model, args.k, args.n)
     model = ProtoNet(args.bert_model, args.mdim, args.bdim)
     model.to(device)
 
@@ -64,10 +64,10 @@ def train(args):
         optimizer.zero_grad()
 
         # Select the episode examples
-        tags_ind, words_ind, true_labels = dataloader.get_episode_data()
+        tags_embd, words_embd, true_labels = get_episode_data(args.k, args.n)
 
         # Episode pass
-        log_loss, predictions = model(tags_ind, words_ind)
+        log_loss, predictions = model(tags_embd, words_embd)
 
         # Calc loss
         loss = loss_fn(log_loss, true_labels)
