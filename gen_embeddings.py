@@ -59,8 +59,6 @@ def save_ptag_embeddings(args, tokenizer, model):
         embedding = model(**encoded_tag)[0].squeeze()
         ptag2embedding[ptag] = torch.mean(embedding, dim=0, keepdim=True)
 
-    print(ptag2embedding)
-
     with open(f'{args.temp_dir}/ptag2embedding.pkl', 'wb') as f:
         pkl.dump(ptag2embedding, f)
 
@@ -170,4 +168,4 @@ if __name__ == '__main__':
     if args.gen_embed:
         generate_embeddings(args)
 
-    #merge_files(args)
+    merge_files(args)
