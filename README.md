@@ -15,6 +15,9 @@ In this project, a neural model is trained on sample.conll data to perform the t
 ## Technologies
 For the project development, following technologies are used:
 - Python: 3.8
+- Numpy
+- PyTorch
+- HuggingFace transformers
 
 ## Setup
 
@@ -26,3 +29,7 @@ For the project development, following technologies are used:
 - Step 0) Enter into the directory of the project from the terminal: `cd pos_tagger`.   
 - Step 1) Generate `sample.conll` file from the given `.conll` files using the command `cat ./data/given_files/*.gold_conll > data/sample.conll` from the terminal.  
 - Step 2) For preprocessing, simply run the command `python3 data_preprocess.py --input_file=data/sample.conll --output_dir=data/` or `data_preprocess.sh` file. 
+
+### Generate training examples
+- Step 0) To generate training examples run (specify paths if needed): `python gen_embeddings.py --gen_embed`
+- Step 1) Remove ./temp_data (or other specified dir) with intermediate results: `rm -r ./temp_data`
