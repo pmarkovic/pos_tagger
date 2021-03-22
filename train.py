@@ -73,9 +73,9 @@ def train(args):
     config.mdim = args.mdim
     config.seed = args.seed
 
-    #print(f"Device: {device}")
-    #print(f"Hyperparameters:\n\tK: {args.k}\n\tN: {args.n}\n\tEp: {args.ep}\n\tlr: {args.lr}")
-    #print(f"{''.join(['-']*20)}\n")
+    print(f"Device: {device}")
+    print(f"Hyperparameters:\n\tK: {args.k}\n\tN: {args.n}\n\tEp: {args.ep}\n\tlr: {args.lr}")
+    print(f"{''.join(['-']*20)}\n")
 
     wandb.watch(model)
     for episode in range(args.ep):
@@ -90,7 +90,6 @@ def train(args):
         # Calc loss
         loss = loss_fn(log_loss, true_labels)
         wandb.log({"ep_loss": loss.item()})
-        print(f"Episode {episode+1} loss: {loss.item()}")
         
         # Calcualte train and validation losses after 10 episodes
         if (episode+1) % 10 == 0:
@@ -98,10 +97,10 @@ def train(args):
             val_acc, valid_loss = eval(model, args.ptag_emb, args.train, device)
 
             wandb.log({"train_loss": train_loss, "valid_loss": valid_loss, "acc": acc, "val_acc": val_acc})
-            #print(f"Processed {episode+1} episodes...")
-
-            print(f"Train loss {train_loss}, after {episode+1} episodes.")
-            print(f"Validation loss {valid_loss}, after {episode+1} episodes.")
+            print(f"Processed {episode+1} episodes...")
+            
+            if episode+1 == 50:
+                torch.save(model, args.model_path+f"model_{args.k}_{args.n}_{episode+1}.pt")
 
         # Backprop step
         loss.backward()
@@ -112,7 +111,7 @@ def train(args):
     print(f"Train acc {acc}, after {episode+1} episodes.")
     print(f"Validation acc {val_acc}, after {episode+1} episodes.")
 
-    torch.save(model, args.model_path+f"model_{args.k}_{args.n}.pt")
+    torch.save(model, args.model_path+f"model_{args.k}_{args.n}_{episode+1}.pt")
 
 
 if __name__ == "__main__":
