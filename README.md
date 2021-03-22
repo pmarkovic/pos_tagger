@@ -27,10 +27,10 @@ For the project development, following technologies are used:
 - Step 0) Clone the repo: `git clone https://github.com/pmarkovic/pos_tagger.git`
 - Step 1) Create conda environment: `conda env create -f pavle_rricha.yml`
 
-### Data Preprocessing
+### Data Preprocessing (TODO: update)
 - Step 0) Enter into the directory of the project from the terminal: `cd pos_tagger`.   
 - Step 1) Generate `sample.conll` file from the given `.conll` files using the command `cat ./data/given_files/*.gold_conll > data/sample.conll` from the terminal.  
-- Step 2) For preprocessing, simply run the command `python3 data_preprocess.py --input_file=data/sample.conll --output_dir=data/` or `data_preprocess.sh` file. 
+- Step 2) For preprocessing, simply run the command `python3 data_preprocessing/data_preprocess.py --input_file=data/sample.conll --output_dir=data/` or `data_preprocessing/data_preprocess.sh` file. 
 
 ### Generate training examples
 - Step 0) To generate training examples run (specify paths if needed): `python3 gen_embeddings.py --gen_embed`
