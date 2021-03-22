@@ -49,8 +49,6 @@ class ProtoNet(nn.Module):
         n_words = words.shape[0]
         n_tags = tags.shape[0]
 
-        print(words.shape, tags.shape)
-        
         # Calculate squared Euclidean distance
         distances = (
                 words.unsqueeze(1).expand(n_words, n_tags, -1) -

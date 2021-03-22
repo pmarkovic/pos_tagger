@@ -13,26 +13,68 @@ logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 FILTERED_POS_TAGS = {"NNP", ",", "DT", "NN", "CC", "CD", "NNS", "PRP", "VBD", "VBN", 
                      "IN", "VBG", ".", "RB", "JJ", "TO", "VB", "VBP", "MD", "VBZ"}
+_DESCRIPTION = """\
+ Every example in the dataset contains:
+ 1) a sentence ID
+ 2) word_list of the words in the sentence
+ 3) tag_list containing POS tag corresponding to each word 
+"""
 
 
-def arg_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--train", default="test_data/ontonotes-4.0.tsv",
-                        help='use this option to provide the path to English POS-tagged data')
-    parser.add_argument("--test", default="test_data/test_set.tsv",
-                        help="use this option to provide the path to combined srb-de POS-tagged data")
-    parser.add_argument("--temp_dir", default="./temp_data",
-                        help="directory where to save intermediate train examples (default=./temp_data).")
-    parser.add_argument("--examples_dir", default="./data",
-                        help="directory where to save final train examples (default=./data).")
-    parser.add_argument("--bert_model", default="bert-base-multilingual-cased",
-                        help="bert model to use for encoding text (default=bert-base-multilingual-cased).")
-    parser.add_argument("--gen_embed", default=False, action="store_true",
-                        help="flag to indicate if embeddings should be generated (default=False).")
-    parser.add_argument("--batch_size", default=50, type=int,
-                        help="batches of sentences will be created with the given size for generating embeddings (default=50)")
-    args = parser.parse_args()
-    return args
+class PosData(datasets.GeneratorBasedBuilder):
+    """
+    converts .tsv files into hugging-face dataset. English dataset is split into train and validation. (80-20 split)
+    srb-de-combined-file is loaded as the test dataset
+    """
+
+    def _info(self):
+        return datasets.DatasetInfo(description=_DESCRIPTION,
+                                    features=datasets.Features({
+                                        "sent_id": datasets.Value("int32"),
+                                        "word_list": datasets.features.Sequence(datasets.Value("string")),
+                                        "tag_list": datasets.features.Sequence(datasets.Value("string")),
+                                    })
+                                    )
+
+    def _split_generators(self, dl_manager):
+        train_file, test_file = self.config.data_files['train'], self.config.data_files['test']
+
+        # combine words into sequence_lists s.t. dataset = [(wordlist1, taglist1), (wordList2, tagList2)..]
+        train_dataset = self.generate_sequenceBased_dataset(train_file)
+        test_dataset = self.generate_sequenceBased_dataset(test_file)
+
+        return [
+            datasets.SplitGenerator(name=datasets.Split.TRAIN, gen_kwargs={"data": train_dataset[:int(0.8*len(train_dataset))]}),
+            datasets.SplitGenerator(name=datasets.Split.VALIDATION, gen_kwargs={"data": train_dataset[int(0.8*len(train_dataset)):]}),
+            datasets.SplitGenerator(name=datasets.Split.TEST, gen_kwargs={"data": test_dataset})
+        ]
+
+    def generate_sequenceBased_dataset(self, filename):
+        dataset = []
+        with open(filename) as f:
+            sent = []
+            pos_tags = []
+            for line in f:
+                if line.startswith('*'):
+                    # marks the end of line
+                    #logging.info(f"{sent}\n{pos_tags}")
+                    dataset.append((sent, pos_tags))
+                    sent, pos_tags = [], []
+                else:
+                    tokens = line.split()
+                    sent.append(tokens[1])
+                    pos_tags.append(tokens[2])
+        return dataset
+
+    def _generate_examples(self, data):
+        logging.info("generating examples..")
+        for id, tup in enumerate(data):
+            #logging.info(f"{tup[0]}\n{tup[1]}")
+            yield id, {
+                "sent_id": id,
+                "word_list": tup[0],
+                "tag_list": tup[1],
+            }
 
 
 def create_input_batches(dataset, batch_size, split='train'):
@@ -52,33 +94,38 @@ def create_input_batches(dataset, batch_size, split='train'):
 
 
 def save_ptag_embeddings(args, tokenizer, model):
-    """save to temp_dir"""
     ptag2embedding = dict()
+
     for ptag in FILTERED_POS_TAGS:
         encoded_tag = tokenizer(ptag, return_tensors="pt", padding=True)
         embedding = model(**encoded_tag)[0].squeeze()
         ptag2embedding[ptag] = torch.mean(embedding, dim=0, keepdim=True)
 
-    with open(f'{args.temp_dir}/ptag2embedding.pkl', 'wb') as f:
+    with open(f'{args.ptag_emb}/ptag2embedding.pkl', 'wb') as f:
         pkl.dump(ptag2embedding, f)
+
+    logging.info(f"saved POS-tag embeddings to {args.ptag_emb}/ptag2embedding.pkl")
 
 
 def generate_embeddings(args):
+    """
+    Generates embeddings for POS-tags and training examples (i.e. words in sentences)
+    """
     Path(args.temp_dir).mkdir(parents=True, exist_ok=True)
+    Path(args.ptag_emb).mkdir(parents=True, exist_ok=True)
     Path(args.examples_dir).mkdir(parents=True, exist_ok=True)
 
     # With AutoTokenizer, huggingface uses faster rust implementation of the tokenizer
     tokenizer = AutoTokenizer.from_pretrained(args.bert_model)
     model = AutoModel.from_pretrained(args.bert_model)
 
-    # create embeddings for tags
+    # create embeddings for POS-tags
     save_ptag_embeddings(args, tokenizer, model)
 
-
-    dataset = datasets.load_dataset('dataloader.py', data_files={'train': args.train, 'test': args.test})
+    dataset = datasets.load_dataset('gen_embeddings.py', data_files={'train': args.train, 'test': args.test})
     # create input batches for training
     input_batches = create_input_batches(dataset, batch_size=args.batch_size, split='train')
-    print(len(input_batches))
+    logging.info(f"Number of input batches : {len(input_batches)}")
 
     n_batch = 0
 
@@ -94,7 +141,6 @@ def generate_embeddings(args):
         tokens_embed = defaultdict(list)
 
         for i, wordlist in enumerate(batched_wordLists):
-            #print(wordlist)
             word2token_position = []
             k = 1 # skip 0th position that contains special token [CLS]
             for j, word in enumerate(wordlist):
@@ -111,11 +157,10 @@ def generate_embeddings(args):
                     end_pos = k
                 word2token_position.append((word, batched_ptags[i][j], start_pos, end_pos + 1)) # (word, pos_tag, token_start_pos, token_end_pos)
                 k += 1
-            #print(word2token_position)
             batched_word2token_position.append(word2token_position)
 
         embeddings = model(**encoded_input)[0].squeeze()
-        #print(embeddings)
+
         # Create dict where keys are POS tags, and values are lists of embeddings
         # of all words that we encountered in dataset
         # Note for one POS tag we can have many embeddings for the same words
@@ -160,6 +205,30 @@ def merge_files(args):
     with open(f"{args.examples_dir}/examples_{ind // 100 + 1}.pkl", "wb") as f:
         pkl.dump(final_embed, f)
         final_embed.clear()
+
+    logging.info(f"saved embeddings for the final training examples to {args.examples_dir}")
+
+
+def arg_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--train", default="test_data/ontonotes-4.0.tsv",
+                        help='use this option to provide the path to English POS-tagged data')
+    parser.add_argument("--test", default="test_data/test_set.tsv",
+                        help="use this option to provide the path to combined srb-de POS-tagged data")
+    parser.add_argument("--temp_dir", default="./temp_data",
+                        help="directory where to save intermediate train examples (default=./temp_data).")
+    parser.add_argument("--examples_dir", default="./embeddings/train_examples",
+                        help="directory where to save final train examples (default=./embeddings/train_examples).")
+    parser.add_argument("--ptag_emb", default="./embeddings",
+                        help='use this option to provide the path to pickled POS-tag embeddings (default: "./embeddings")')
+    parser.add_argument("--bert_model", default="bert-base-multilingual-cased",
+                        help="bert model to use for encoding text (default=bert-base-multilingual-cased).")
+    parser.add_argument("--gen_embed", default=False, action="store_true",
+                        help="flag to indicate if embeddings should be generated (default=False).")
+    parser.add_argument("--batch_size", default=50, type=int,
+                        help="batches of sentences will be created with the given size for generating embeddings (default=50)")
+    args = parser.parse_args()
+    return args
 
 
 if __name__ == '__main__':
