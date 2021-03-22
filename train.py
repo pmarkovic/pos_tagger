@@ -17,17 +17,17 @@ def arg_parser():
                         help="path where to save the trained model (default=models/model.pt).")
     parser.add_argument("--bert_model", default="bert-base-multilingual-cased",
                         help="bert model to use for encoding text (default=bert-base-multilingual-cased).")
-    parser.add_argument("--mdim", default=512,
+    parser.add_argument("--mdim", default=512, type=int,
                         help="dimension of embeddings in a metric space (default=512).")
-    parser.add_argument("--bdim", default=768,
+    parser.add_argument("--bdim", default=768, type=int,
                         help="dimension of bert model embeddings (default=768).")
-    parser.add_argument("--seed", default=777,
+    parser.add_argument("--seed", default=777, type=int,
                         help="seed for reproducibility purpose (default=777).")
-    parser.add_argument("--k", default=10,
+    parser.add_argument("--k", default=10, type=int,
                         help="number of classes/tags per episode (default=10).")
-    parser.add_argument("--n", default=5,
+    parser.add_argument("--n", default=5, type=int,
                         help="number of examples/shots per class per episode (default=5).")
-    parser.add_argument("--ep", default=100,
+    parser.add_argument("--ep", default=100, type=int,
                         help="number of episodes per training (default=100).")
     parser.add_argument("--lr", default=1e-3,
                         help="learning rate (default=1e-3).")
@@ -70,7 +70,7 @@ def train(args):
         optimizer.zero_grad()
 
         # Select the episode examples
-        tags_embd, words_embd, true_labels = get_episode_data(args.ptag_emb, args.train, args.k, args.n)
+        tags_embd, words_embd, true_labels = get_episode_data(args.ptag_emb, args.train, args.k, args.n, device)
 
         # Episode pass
         log_loss, predictions = model(tags_embd, words_embd)

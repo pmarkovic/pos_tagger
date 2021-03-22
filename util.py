@@ -53,7 +53,7 @@ def eval(model, ptag_emb_filepath, train_eg_dir, split='validation'):
     return np.mean(np.asarray(all_results))
 
 
-def get_episode_data(ptag_emb_filepath, train_eg_dir, k, n):
+def get_episode_data(ptag_emb_filepath, train_eg_dir, k, n, device='cpu'):
     """
     This fn. prepares input for episodic learning
     :param k: number of classes i.e. POS-tags
@@ -83,9 +83,9 @@ def get_episode_data(ptag_emb_filepath, train_eg_dir, k, n):
             episode_labels.append(ind)
 
     episode_tags_embs = [ ptag2embed_dict[tag] for tag in episode_tags ]  # embeddings for the randomly chosen tags/labels
-    episode_tags_embs = torch.cat(episode_tags_embs).to('cpu') # device = 'cpu'/'gpu'
+    episode_tags_embs = torch.cat(episode_tags_embs).to(device)
     episode_labels = torch.tensor(episode_labels)
-    episode_word_embs = torch.stack(episode_word_embs).to('cpu')
+    episode_word_embs = torch.stack(episode_word_embs).to(device)
 
     return  episode_tags_embs, episode_word_embs, episode_labels
 
