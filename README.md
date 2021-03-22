@@ -21,7 +21,40 @@ For the project development, following technologies are used:
 
 ## Setup
 
-### Project Directory Structure (TODO)
+### Project Directory Structure (TODO: update in the end)
+```
+.
+├── data_preprocessing
+│   ├── data_preprocess.py
+│   └── data_preprocess.sh
+├── embeddings
+│   ├── ptag2embedding.pkl
+│   └── train_examples
+│       ├── examples_10.pkl
+│       ├── examples_11.pkl
+│       ├── examples_12.pkl
+│       ├── examples_1.pkl
+│       ├── examples_2.pkl
+│       ├── examples_3.pkl
+│       ├── examples_4.pkl
+│       ├── examples_5.pkl
+│       ├── examples_6.pkl
+│       ├── examples_7.pkl
+│       ├── examples_8.pkl
+│       └── examples_9.pkl
+├── gen_embeddings.py
+├── model.py
+├── pavle_rricha.yml
+├── README.md
+├── test_data
+│   ├── ontonotes-4.0.info
+│   ├── ontonotes-4.0.tsv
+│   └── test_set.tsv
+├── train.py
+└── util.py
+
+
+```
 
 ### Create environment
 - Step 0) Clone the repo: `git clone https://github.com/pmarkovic/pos_tagger.git`
