@@ -9,6 +9,7 @@
 8	zu	TO
 9	erheben	VB
 10	.	.
+*
 0	All	DT
 1	dies	DT
 2	entspricht	VB
@@ -21,6 +22,7 @@
 9	verteidigt	VB
 10	haben	MD
 11	.	.
+*
 0	Vielen	DT
 1	Dank	NN
 2	,	,
@@ -33,6 +35,7 @@
 9	gerne	RB
 10	tun	VB
 11	.	.
+*
 0	Das	DT
 1	ist	MD
 2	der	DT
@@ -41,6 +44,7 @@
 5	Alexander	NNP
 6	Nikitin	NN
 7	.	.
+*
 0	Dennoch	RB
 1	,	,
 2	Frau	NN
@@ -52,6 +56,7 @@
 8	nicht	RB
 9	entsprochen	VB
 10	.	.
+*
 0	Ich	PRP
 1	hoffe	VB
 2	,	,
@@ -63,6 +68,7 @@
 8	entschieden	VB
 9	wird	MD
 10	.	.
+*
 0	Warum	WP
 1	finden	VB
 2	keine	DT
@@ -87,6 +93,7 @@
 21	das	DT
 22	prüfen	VB
 23	.	.
+*
 0	Es	PRP
 1	besteht	VB
 2	sogar	RB
@@ -95,6 +102,7 @@
 5	eines	DT
 6	Militärputsches	NN
 7	.	.
+*
 0	Wir	PRP
 1	wissen	VB
 2	nicht	RB
@@ -102,6 +110,7 @@
 4	was	WDT
 5	passiert	VB
 6	.	.
+*
 0	Zu	IN
 1	Montag	NN
 2	und	CC
@@ -111,6 +120,7 @@
 6	Änderungen	NN
 7	vor	RP
 8	.	.
+*
 0	Danach	RB
 1	verfahren	VB
 2	wir	PRP
@@ -124,6 +134,7 @@
 10	einer	DT
 11	dagegen	RB
 12	.	.
+*
 0	Der	DT
 1	Kollege	NN
 2	Hänsch	NN
@@ -132,6 +143,7 @@
 5	dort	RB
 6	vertreten	VB
 7	.	.
+*
 0	Nur	RB
 1	Ihre	PRP$
 2	Fraktion	NN
@@ -144,11 +156,13 @@
 9	jetzt	RB
 10	sagen	VB
 11	.	.
+*
 0	Wir	PRP
 1	haben	MD
 2	dann	RB
 3	abgestimmt	VB
 4	.	.
+*
 0	Es	PRP
 1	gab	VB
 2	eine	DT
@@ -157,17 +171,20 @@
 5	diesem	DT
 6	Punkt	NN
 7	.	.
+*
 0	Alle	DT
 1	anderen	DT
 2	waren	MD
 3	anderer	JJ
 4	Meinung	NN
 5	.	.
+*
 0	Das	DT
 1	war	MD
 2	der	DT
 3	Beschluß	NN
 4	.	.
+*
 0	Jetzt	RB
 1	möchte	MD
 2	ich	PRP
@@ -177,6 +194,7 @@
 6	etwas	DT
 7	sagen	VB
 8	.	.
+*
 0	Ein	DT
 1	solches	DT
 2	Dokument	NN
@@ -189,6 +207,7 @@
 9	dem	DT
 10	zugestimmt	VB
 11	.	.
+*
 0	Beifall	NN
 1	von	IN
 2	der	DT
@@ -200,9 +219,11 @@
 8	Antrag	NN
 9	ab	RP
 10	.	.
+*
 0	Die	DT
 1	Präsidentin	NN
 2	.	.
+*
 0	Die	DT
 1	PPE-DE-Fraktion	NN
 2	beantragt	VB
@@ -214,3 +235,4 @@
 8	Tagesordnung	NN
 9	abzusetzen	VB
 10	.	.
+*

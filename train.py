@@ -81,8 +81,8 @@ def train(args):
         
         # Calcualte train and validation losses after 10 episodes
         if (episode+1) % 10 == 0:
-            _, train_loss = eval(model, args.ptag_emb, args.train, device, split="train")
-            _, valid_loss = eval(model, args.ptag_emb, args.train, device)
+            acc, train_loss = eval(model, args.ptag_emb, args.train, device, split="train")
+            val_acc, valid_loss = eval(model, args.ptag_emb, args.train, device)
 
             print(f"Train loss {train_loss}, after {episode+1} episodes.")
             print(f"Validation loss {valid_loss}, after {episode+1} episodes.")
@@ -93,7 +93,10 @@ def train(args):
 
     print("End of training...")
 
-    torch.save(model, args.model_path+"model.pt")
+    print(f"Train acc {acc}, after {episode+1} episodes.")
+    print(f"Validation acc {val_acc}, after {episode+1} episodes.")
+
+    torch.save(model, args.model_path+f"model_{args.k}_{args.n}.pt")
 
 
 if __name__ == "__main__":

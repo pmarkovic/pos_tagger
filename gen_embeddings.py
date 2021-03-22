@@ -82,14 +82,18 @@ def create_input_batches(dataset, batch_size, split='train'):
     batched_wordLists = []
     input_batches = []
     pos_tags = []
+
     for sent in dataset[split]:
         batched_wordLists.append(sent['word_list'])
         pos_tags.append(sent['tag_list'])
+
         if len(batched_wordLists) % batch_size == 0:
             input_batches.append((batched_wordLists, pos_tags))
             batched_wordLists = []
             pos_tags = []
+
     input_batches.append((batched_wordLists, pos_tags))
+    
     return input_batches
 
 

@@ -6,7 +6,7 @@
 5	nevini	JJ
 6	nastradaju	VB
 7	.	.
-
+*
 0	koliko	RB
 1	znam	VB
 2	,	,
@@ -16,7 +16,7 @@
 6	nije	VB
 7	održan	JJ
 8	.	.
-
+*
 0	njihovi	PRP$
 1	protivnici	NN
 2	tvrde	VB
@@ -28,7 +28,7 @@
 8	autonomije	NN
 9	univerziteta	NN
 10	.	.
-
+*
 0	uveče	RB
 1	kad	CC
 2	bi	VB
@@ -43,7 +43,7 @@
 11	njegovo	PRP$
 12	predavanje	NN
 13	.	.
-
+*
 0	on	PRP
 1	će	VB
 2	je	PRP
@@ -51,7 +51,7 @@
 4	ili	CC
 5	uništiti	VB
 6	.	.
-
+*
 0	naše	PRP$
 1	telo	NN
 2	nas	PRP
@@ -66,7 +66,7 @@
 11	oko	IN
 12	nas	PRP
 13	.	.
-
+*
 0	dal	NNP
 1	su	VB
 2	potrebni	JJ
@@ -81,7 +81,7 @@
 11	se	PRP
 12	radi	VB
 13	.	.
-
+*
 0	podizanje	NN
 1	skija	NN
 2	tokom	IN
@@ -93,7 +93,7 @@
 8	prave	VB
 9	početnici	NN
 10	.	.
-
+*
 0	programa	NN
 1	i	CC
 2	strategije	NN
@@ -102,7 +102,7 @@
 5	su	VB
 6	nesposobni	JJ
 7	.	.
-
+*
 0	aviokompanija	NN
 1	je	VB
 2	poslednjih	JJ
@@ -115,7 +115,7 @@
 9	štrajkova	NN
 10	zaposlenih	JJ
 11	.	.
-
+*
 0	kontejneri	NN
 1	za	IN
 2	reciklažu	NN
@@ -126,7 +126,7 @@
 7	i	CC
 8	biće	NN
 9	postavljen	JJ
-
+*
 0	sedimo	VB
 1	često	RB
 2	kraj	IN
@@ -135,7 +135,7 @@
 5	posmatramo	VB
 6	golubove	NN
 7	.	.
-
+*
 0	finansijski	JJ
 1	plan	NN
 2	se	PRP
@@ -149,7 +149,7 @@
 10	finansijskih	JJ
 11	instituta	NN
 12	.	.
-
+*
 0	prevucite	VB
 1	alatkom	NN
 2	duž	IN
@@ -162,7 +162,7 @@
 9	ivicu	NN
 10	slike	NN
 11	.	.
-
+*
 0	pariz	NNP
 1	je	VB
 2	jedini	JJ
@@ -175,7 +175,7 @@
 9	grad	NN
 10	svetlosti	NN
 11	.	.
-
+*
 0	analiza	NN
 1	novih	JJ
 2	zakonskih	JJ
@@ -187,7 +187,7 @@
 8	prevencije	NN
 9	siromaštva	NN
 10	.	.
-
+*
 0	idem	VB
 1	pre	IN
 2	neki	DT
@@ -195,7 +195,7 @@
 4	u	IN
 5	beograd	NNP
 6	.	.
-
+*
 0	koristite	VB
 1	sve	JJ
 2	što	PRP
@@ -205,7 +205,7 @@
 6	i	CC
 7	govorio	VB
 8	.	.
-
+*
 0	znojenje	NN
 1	je	VB
 2	jedan	CD
@@ -219,7 +219,7 @@
 10	prilikom	IN
 11	pregrevanja	NN
 12	.	.
-
+*
 0	ovo	DT
 1	je	VB
 2	na	IN
@@ -228,7 +228,7 @@
 5	divna	JJ
 6	stvar	NN
 7	.	.
-
+*
 0	taj	DT
 1	posao	NN
 2	završen	JJ
@@ -238,7 +238,7 @@
 6	štetu	NN
 7	srba	NNP
 8	.	.
-
+*
 0	svake	DT
 1	godine	NN
 2	manifestacija	NN
@@ -249,7 +249,7 @@
 7	nešto	PRP
 8	novo	JJ
 9	.	.
-
+*
 0	podaci	NN
 1	za	IN
 2	italiju	NNP
@@ -262,7 +262,7 @@
 9	u	IN
 10	godini	NN
 11	.	.
-
+*
 0	prepisku	NN
 1	koja	DT
 2	ne	PART
@@ -275,7 +275,7 @@
 9	na	IN
 10	vešala	NN
 11	.	.
-
+*
 0	ti	PRP
 1	si	VB
 2	mlada	JJ
@@ -286,3 +286,4 @@
 7	se	PRP
 8	udati	VB
 9	.	.
+*
