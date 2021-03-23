@@ -217,8 +217,8 @@ def arg_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--train", default="test_data/ontonotes-4.0.tsv",
                         help='use this option to provide the path to English POS-tagged data')
-    parser.add_argument("--test", default="test_data/test_set.tsv",
-                        help="use this option to provide the path to combined srb-de POS-tagged data")
+    parser.add_argument("--test", default="test_data/srb_test_set.tsv",
+                        help="use this option to provide the path to SRB or DE POS-tagged data")
     parser.add_argument("--temp_dir", default="./temp_data",
                         help="directory where to save intermediate train examples (default=./temp_data).")
     parser.add_argument("--examples_dir", default="./embeddings/train_examples",

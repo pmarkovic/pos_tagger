@@ -20,7 +20,7 @@ For the project development, following technologies are used:
 
 ## Setup
 
-### Project Directory Structure (TODO: update in the end)
+### Final Project Directory Structure  
 ```
 .
 ├── data_preprocessing
@@ -43,15 +43,23 @@ For the project development, following technologies are used:
 │       └── examples_9.pkl
 ├── gen_embeddings.py
 ├── model.py
+├── models
+│   ├── model_10_1_100.pt
+│   ├── model_10_1_50.pt
+│   ├── ...
 ├── pavle_rricha.yml
 ├── README.md
+├── results
+│   ├── de-test.json
+│   └── srb_test_set.json
 ├── test_data
+│   ├── de-test.tsv
 │   ├── ontonotes-4.0.info
 │   ├── ontonotes-4.0.tsv
-│   └── test_set.tsv
+│   └── srb_test_set.tsv
+├── test.py
 ├── train.py
 └── util.py
-
 
 ```
 
@@ -59,12 +67,19 @@ For the project development, following technologies are used:
 - Step 0) Clone the repo: `git clone https://github.com/pmarkovic/pos_tagger.git`
 - Step 1) Create conda environment: `conda env create -f pavle_rricha.yml`
 
-### Data Preprocessing (TODO: update)
+### Data Preprocessing 
 - Step 0) Enter into the directory of the project from the terminal: `cd pos_tagger`.     
-- Step 1) For preprocessing, simply run the command `python3 data_preprocessing/data_preprocess.py --input_file=data/sample.conll --output_dir=data/` or `data_preprocessing/data_preprocess.sh` file. 
+- Step 1) For preprocessing, simply run the command `python3 data_preprocessing/data_preprocess.py` or `data_preprocessing/data_preprocess.sh` file. 
+```
+usage: data_preprocess.py [-h] [--data_dir DATA_DIR] [--out_dir OUT_DIR]
 
+optional arguments:
+  -h, --help           show this help message and exit
+  --data_dir DATA_DIR  use this option to provide a path to data dir (default=test_data/ontonetes-4.0).
+  --out_dir OUT_DIR    use this option to provide the output dir (default=test_data/)
+```
 ### Generate training examples
-- Step 0) To generate training examples run (specify paths if needed): `python3 gen_embeddings.py --gen_embed`
+- Step 0) To generate training examples run: `python3 gen_embeddings.py --gen_embed`. It takes a while to run (approx. 1 hour).
 - Step 1) Remove ./temp_data (or other specified dir) with intermediate results: `rm -r ./temp_data`
 ```
 usage: gen_embeddings.py [-h] [--train TRAIN] [--test TEST] [--temp_dir TEMP_DIR] [--examples_dir EXAMPLES_DIR] [--ptag_emb PTAG_EMB] [--bert_model BERT_MODEL] [--gen_embed] [--batch_size BATCH_SIZE]

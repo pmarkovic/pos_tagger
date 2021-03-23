@@ -9,9 +9,9 @@ def arg_parser():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--data_dir", default='test_data/ontonetes-4.0',
-                        help='use this option to provide a path to data dir (default=data/ontonetes-4.0).')
+                        help='use this option to provide a path to data dir (default=test_data/ontonetes-4.0).')
     parser.add_argument("--out_dir", default='test_data/',
-                        help="use this option to provide the output dir (default=data/)")
+                        help="use this option to provide the output dir (default=test_data/)")
     args = parser.parse_args()
     return args
 

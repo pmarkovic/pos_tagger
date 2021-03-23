@@ -1,1 +1,1 @@
- python3 data_preprocess.py --input_file=data/sample.conll --output_dir=data/
+ python3 data_preprocess.py --input_file=test_data/ontonetes-4.0 --output_dir=test_data/
