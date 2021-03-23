@@ -1,3 +1,5 @@
+import os
+import json
 import argparse
 import pickle as pkl
 from copy import deepcopy
@@ -16,8 +18,10 @@ def arg_parser():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--model", default="./models/model.pt",
-                        help="path to the trained model (default=./models/model.pt).")
+    parser.add_argument("--models_dir", default="./models",
+                        help="path to the trained models (default=./models).")
+    parser.add_argument("--results_dir", default="./results",
+                        help="path to the results dir (default=./results).")
     parser.add_argument("--test", default="./test_data/de-test.tsv",
                         help="path to the test set (default=./test_data/de-test.tsv).")
     parser.add_argument("--bert_model", default="bert-base-multilingual-cased",
@@ -103,32 +107,39 @@ def get_pos_embeddings(args):
 
 
 def test(args):
-    print("Obtaining pos tags embeddings...")
+    results = defaultdict(float)
     tags_embed, tag2ind = get_pos_embeddings(args)
-
-    print("Obtaining test set embeddings...")
     words_embed, labels = get_words_embeddings(args, tag2ind)
 
-    print("Loading model...")
-    model = torch.load(args.model)
 
-    # Do prediction
-    print("Doing predictions...")
-    _, predictions = model(tags_embed, words_embed)
+    for model_name in os.listdir(args.models_dir):
+        model_path = os.path.join(args.models_dir, model_name)
+        model = torch.load(model_path)
+        model_result = 0
+        
+        for i in range(10):
+            _, predictions = model(tags_embed, words_embed)
+            pred_labels = torch.argmax(predictions, dim=1)
+            curr_result = pred_labels == labels
+            model_result += curr_result.sum().item() / curr_result.shape[0]
 
-    # Evaluate predictions
-    print("Evaluating predictions...")
-    pred_labels = torch.argmax(predictions, dim=1)
-    result = pred_labels == labels
+        results[model_name.split('.')[0]] = round(model_result / 10, 2)
     
-    return result.sum().item() / result.shape[0]
+    return results
+
+
+def save_results(args, results):
+    test_set_name = args.test[:-4].split('/')[-1]
+    results_file = os.path.join(args.results_dir, f"{test_set_name}.json")
+
+    with open(results_file, 'w') as f:
+        json.dump(results, f, indent=2)
+
 
 
 if __name__ == "__main__":
     args = arg_parser()
 
-    print(f"Start testing on set: {args.test}")
-    
-    test_result = test(args)
+    results = test(args)
 
-    print(f"Testing result: {test_result}!")
+    save_results(args, results)
