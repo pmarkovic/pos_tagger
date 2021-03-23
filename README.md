@@ -1,5 +1,5 @@
 # A neural POS tagger
-Implementation of a neural model for the Part-Of-Speech tagging task for English language.
+Implementation of a neural model for the Part-Of-Speech tagging task for English, German and Serbian.
 
 ## Table of Contents
 * [General Information](#General-info)
@@ -7,10 +7,8 @@ Implementation of a neural model for the Part-Of-Speech tagging task for English
 * [Setup](#Setup)
 
 ## General Information
-Part-Of-Speech tagging is a NLP task for labeling words in a text with proper Part-Of-Speech tags. This task is useful for analyzing linguistic properties of a text, but it can be used for improving results on other tasks (e.g. sentiment analysis) as well. Example (from the Speech and Language Processing book, ch.8):
-> There/PRO/EX are/VERB/VBP 70/NUM/CD children/NOUN/NNSthere/ADV/RB ./PUNC/
-
-In this project, a neural model is trained on sample.conll data to perform the task.
+Part-of-Speech labelling is an important task in Natural Language Procressing, since POS-tags provide more linguistic information about tokens and can help in achieving a deeper understanding of a given text. In this work, we employ a few-shot learning approach, in particular, Prototypical Networks, to investigate whether a POS-tag classifier trained on English examples can also be used for POS-tag classification of two other low resource languages - German and Serbian. We utilize multilingual BERT embeddings to learn contextual representation of words across different languages and then train a Prototypical Network to learn a representation of words and their corresponding POS-tags, in metric space. We perform evaluation on a manually curated corpus containing Universal POS tags for 216 German and 264 Serbian words.
+The plots and visualizations from our training can be found at (https://wandb.ai/pmarkovic/multi-pos).
 
 ## Technologies
 For the project development, following technologies are used:
@@ -18,6 +16,7 @@ For the project development, following technologies are used:
 - Numpy
 - PyTorch
 - HuggingFace transformers
+- Weights & Biases
 
 ## Setup
 
@@ -61,9 +60,8 @@ For the project development, following technologies are used:
 - Step 1) Create conda environment: `conda env create -f pavle_rricha.yml`
 
 ### Data Preprocessing (TODO: update)
-- Step 0) Enter into the directory of the project from the terminal: `cd pos_tagger`.   
-- Step 1) Generate `sample.conll` file from the given `.conll` files using the command `cat ./data/given_files/*.gold_conll > data/sample.conll` from the terminal.  
-- Step 2) For preprocessing, simply run the command `python3 data_preprocessing/data_preprocess.py --input_file=data/sample.conll --output_dir=data/` or `data_preprocessing/data_preprocess.sh` file. 
+- Step 0) Enter into the directory of the project from the terminal: `cd pos_tagger`.     
+- Step 1) For preprocessing, simply run the command `python3 data_preprocessing/data_preprocess.py --input_file=data/sample.conll --output_dir=data/` or `data_preprocessing/data_preprocess.sh` file. 
 
 ### Generate training examples
 - Step 0) To generate training examples run (specify paths if needed): `python3 gen_embeddings.py --gen_embed`
@@ -130,3 +128,5 @@ optional arguments:
                         batches of sentences will be created with the given
                         size for generating embeddings (default=50)
 ```
+
+
