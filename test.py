@@ -111,7 +111,6 @@ def test(args):
     tags_embed, tag2ind = get_pos_embeddings(args)
     words_embed, labels = get_words_embeddings(args, tag2ind)
 
-
     for model_name in os.listdir(args.models_dir):
         model_path = os.path.join(args.models_dir, model_name)
         model = torch.load(model_path)
@@ -134,7 +133,6 @@ def save_results(args, results):
 
     with open(results_file, 'w') as f:
         json.dump(results, f, indent=2)
-
 
 
 if __name__ == "__main__":
